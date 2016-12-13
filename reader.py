@@ -10,9 +10,12 @@ import requests
 
 import asyncio
 import aiohttp
+import logging
+
+logger = logging.getLogger(__name__)
 
 Record = namedtuple("SubstRecord",
-        ["period", "grade", "teacher", "lesson", "room", "text", "orig_lesson", "orig_room"])
+        ["period", "grade", "teacher", "lesson", "room", "text", "orig_teacher", "orig_lesson", "orig_room"])
 
 class MWT(object):
     """Memoize With Timeout"""
@@ -40,11 +43,11 @@ class MWT(object):
             key = (args, tuple(kw))
             try:
                 v = self.cache[key]
-                print("cache")
+                logger.debug("request served from cache")
                 if (time.time() - v[1]) > self.timeout:
                     raise KeyError
             except KeyError:
-                print("new")
+                logger.debug("request missed cache")
                 v = self.cache[key] = f(*args,**kwargs),time.time()
                 self.collect()
             return v[0]
@@ -184,7 +187,7 @@ def parse_subst(subst):
 
     res = []
     for tr in rows:
-        row = tr.find_all("td")
+        row = tr.find_all("td")[:9]
         if len(row) > 1:
             row = [clean(elem.text) for elem in row]
             res.append(Record(*row))

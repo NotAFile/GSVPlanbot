@@ -17,10 +17,18 @@ import aiocron
 import reader
 import database
 
+import colorlog
+
 locale.setlocale(locale.LC_TIME, "")
 
-logging.basicConfig(level=logging.DEBUG)
-logger = logging.getLogger(__name__)
+handler = colorlog.StreamHandler()
+colorlog.basicConfig(level=logging.DEBUG)
+handler.setFormatter(colorlog.ColoredFormatter(
+    '%(log_color)s%(levelname)s:%(name)s:%(message)s'))
+
+logger = colorlog.getLogger(__name__)
+logger.propagate = False
+logger.addHandler(handler)
 
 CONFIG = {}
 
@@ -124,10 +132,14 @@ class VPlanBot(telepot.async.Bot):
             try:
                 result = self.reader.get_day(day)
             except:
+                logger.exception("could not get")
                 yield from self.sendMessage(chat_id, "Error - could not get")
                 return
 
             result.data = [x for x in result.data if "Q" in x.grade and "3" in x.grade]
+
+            logging.info(result.headers)
+            logging.info(result.data)
 
             message = format_subst(result, day.strftime("%A, %d. %B"))
 
