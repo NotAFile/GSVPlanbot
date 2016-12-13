@@ -131,9 +131,15 @@ class VPlanBot(telepot.async.Bot):
             day = date.today() + timedelta(days=num)
             try:
                 result = self.reader.get_day(day)
-            except:
+            except reader.NoSubstError:
+                logger.info("no subst available for request")
+                yield from self.sendMessage(chat_id, "Für diesen Tag ist keine Vertretung verfügbar")
+                return
+            except Exception as e:
                 logger.exception("could not get")
                 yield from self.sendMessage(chat_id, "Error - could not get")
+                notification = "request failed:\n{}\n{}".format(msg, e)
+                yield from self.sendMessage(CONFIG["notify_id"], notification)
                 return
 
             result.data = [x for x in result.data if "Q" in x.grade and "3" in x.grade]
@@ -158,14 +164,14 @@ class VPlanBot(telepot.async.Bot):
         recievers = self.usermanager.get_broadcasters()
         print(recievers)
 
-        yield from self.sendMessage(219241265, "sending daily messages")
+        yield from self.sendMessage(CONFIG["notify_id"], "sending daily messages")
         print("sending daily messages")
 
         day = date.today() + timedelta(days=1)
         try:
             result = self.reader.get_day(day)
         except:
-            yield from self.sendMessage(219241265, "Error getting daily")
+            yield from self.sendMessage(CONFIG["notify_id"], "Error getting daily")
             return
 
         result.data = [x for x in result.data if "Q" in x.grade and "3" in x.grade]
@@ -176,7 +182,7 @@ class VPlanBot(telepot.async.Bot):
             yield from self.sendMessage(chat_id, message)
 
         notification = "sent daily messages to {} users".format(len(recievers))
-        yield from self.sendMessage(219241265, notification)
+        yield from self.sendMessage(CONFIG["notify_id"], notification)
         logger.info(notification)
 
     @asyncio.coroutine

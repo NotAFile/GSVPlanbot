@@ -10,12 +10,14 @@ def test():
     local("pylint3 *.py -E -j 4 -f colorized")
     local("python test.py")
 
-def deploy():
+def deploy(directory="~/GSVPlanBot-git"):
+    local("git diff-index --quiet HEAD --")
     test()
     backup_db()
 
-    with cd("~/GSVPlanBot/GSVPlanBot"):
+    with cd(directory + "/GSVPlanBot"):
         run("git pull")
+        run(directory + "/env/bin/pip install -r GSVPlanBot/requirements.txt")
         run("systemctl --user restart GSVPlanBot")
 
 def backup_db():
@@ -26,4 +28,5 @@ def setup_instance(directory):
     run("mkdir " + directory)
     with cd(directory):
         run("git clone https://github.com/NotAFile/GSVPlanBot")
-        run("pyvenv 
+        run("pyvenv env")
+        run("env/bin/pip install -r GSVPlanBot/requirements.txt")

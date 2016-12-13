@@ -23,7 +23,7 @@ class ReaderTest(unittest.TestCase):
         self.reader._download(url)
 
     def test_get_day(self):
-        d = date(day=17, month=8, year=2016)
+        d = date(day=9, month=12, year=2016)
         day = self.reader.get_day(d)
 
     @unittest.skipIf(datetime.today().weekday() > 4,

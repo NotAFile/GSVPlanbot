@@ -60,6 +60,11 @@ class RequestError(Exception):
     Error that occurs if an ivalid substitution is requested
     """
 
+class NoSubstError(RequestError):
+    """
+    Error that occurs if an ivalid substitution is requested
+    """
+
 class Reader:
     """
     Reader objecs are used to request subsitutions from a specific instance of UNITS
@@ -96,7 +101,7 @@ class Reader:
         try:
             res = find(vplan)[weekday]
         except IndexError:
-            raise RequestError("No substitution for this day")
+            raise NoSubstError("No substitution for this day")
 
         return res
 
@@ -190,6 +195,9 @@ def parse_subst(subst):
         row = tr.find_all("td")[:9]
         if len(row) > 1:
             row = [clean(elem.text) for elem in row]
+            if len(row) != 9:
+                print("----------########----------")
+                print(row)
             res.append(Record(*row))
 
     return res
