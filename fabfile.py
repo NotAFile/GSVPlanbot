@@ -11,7 +11,9 @@ def test():
     local("python test.py")
 
 def deploy(directory="~/GSVPlanBot-git"):
-    local("git diff-index --quiet HEAD --")
+    # check if there are uncommitted changes
+    local("git diff-index --quiet HEAD --") 
+
     test()
     backup_db()
 
@@ -22,7 +24,7 @@ def deploy(directory="~/GSVPlanBot-git"):
 
 def backup_db():
     timestamp = dt.now().strftime("%Y-%m-%d %H:%M")
-    run("cp users.db ../backups/users.db+" + timestamp + ".bak")
+    run("cp users.db \"../backups/users.db+" + timestamp + ".bak\"")
 
 def setup_instance(directory):
     run("mkdir " + directory)
