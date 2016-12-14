@@ -14,21 +14,24 @@ def deploy(directory="~/GSVPlanBot-git"):
     # check if there are uncommitted changes
     local("git diff-index --quiet HEAD --") 
 
-    test()
-    backup_db()
+    with cd(directory):
+        backup_db()
 
+    test()
     with cd(directory + "/GSVPlanBot"):
         run("git pull")
-        run(directory + "/env/bin/pip install -r GSVPlanBot/requirements.txt")
+        run(directory + "/env/bin/pip install -r requirements.txt")
         run("systemctl --user restart GSVPlanBot")
+        run("sleep 5; systemctl --user status GSVPlanBot")
 
 def backup_db():
     timestamp = dt.now().strftime("%Y-%m-%d %H:%M")
-    run("cp users.db \"../backups/users.db+" + timestamp + ".bak\"")
+    run("cp GSVPlanBot/users.db \"backups/users.db+" + timestamp + ".bak\"")
 
 def setup_instance(directory):
     run("mkdir " + directory)
     with cd(directory):
         run("git clone https://github.com/NotAFile/GSVPlanBot")
+        run("mkdir backups")
         run("pyvenv env")
         run("env/bin/pip install -r GSVPlanBot/requirements.txt")
