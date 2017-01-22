@@ -35,3 +35,4 @@ def setup_instance(directory):
         run("mkdir backups")
         run("pyvenv env")
         run("env/bin/pip install -r GSVPlanBot/requirements.txt")
+        run("touch GSVPlanBot/users.db")
