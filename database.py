@@ -1,3 +1,7 @@
+"""
+Database Module. Used to manage users and their settings
+"""
+
 import sqlite3
 import datetime
 import hashlib
@@ -13,9 +17,9 @@ class SubstManager:
         self.conn = connection
         self.cur = self.conn.cursor()
         self.cur.execute("CREATE TABLE IF NOT EXISTS messages("
-            "id INTEGER PRIMARY KEY,"
-            "hash TEXT NOT NULL,"
-            "time INT NOT NULL);")
+                         "id INTEGER PRIMARY KEY,"
+                         "hash TEXT NOT NULL,"
+                         "time INT NOT NULL);")
 
     @staticmethod
     def hash_subst(subst, date) -> str:
@@ -30,7 +34,7 @@ class SubstManager:
 
         if res is None:
             self.cur.execute("INSERT INTO messages(hash,time) VALUES (?, ?)",
-                    (subst_hash, date.strftime("%s")))
+                            (subst_hash, date.strftime("%s")))
             return True
         else:
             return False
@@ -47,7 +51,7 @@ class User:
 
 class Subject:
     @classmethod
-    def new_subject(sub_id:str, human_name:str=None):
+    def new_subject(sub_id: str, human_name: str=None):
         pass
     pass
 
