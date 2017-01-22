@@ -19,6 +19,7 @@ def deploy(directory="~/GSVPlanBot-git"):
 
     test()
     with cd(directory + "/GSVPlanBot"):
+        put("../keyfile.prod", "../keyfile")
         run("git pull")
         run(directory + "/env/bin/pip install -r requirements.txt")
         run("systemctl --user restart GSVPlanBot")
