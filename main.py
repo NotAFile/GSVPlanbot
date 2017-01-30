@@ -137,6 +137,15 @@ class VPlanBot(telepot.async.Bot):
             self.suspend_days = days
             yield from self.sendMessage(CONFIG["notify_id"],
                     "suspending broadcast for {} more days".format(days))
+            return
+
+        if msg["text"].startswith("/start"):
+            yield from self.sendMessage(chat_id,
+                "Wilkommen beim GSVPlanBot!\n"
+                "Gib eine Zahl ein, wie viele Tage in der zukunft du"
+                "den VPlan erhalten willst. Z.B. 0 für heute, 1 für morgen\n\n"
+                "bei Fragen und Problemen an Adrian (auf tg @notafile) wenden")
+            return
 
         try:
             num = int(msg["text"])
