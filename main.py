@@ -90,6 +90,8 @@ class VPlanBot(telepot.async.Bot):
 
         self.reader = reader.Reader(CONFIG["url"], (CONFIG["user"], CONFIG["pass"]))
 
+        self.suspend_days = 0
+
         @aiocron.crontab("0 18 * * 0-4")
         #@aiocron.crontab("* * * * * */5")
         @asyncio.coroutine
@@ -128,6 +130,13 @@ class VPlanBot(telepot.async.Bot):
                 logging.debug("sent to %s", user_id)
                 yield from self.sendMessage(user_id, msg["text"][4:])
             return
+
+        if msg["text"].startswith("/disable") and chat_id == int(CONFIG["notify_id"]):
+            days = int(msg["text"][9:])
+            logger.info("disabling for %s days", days)
+            self.suspend_days = days
+            yield from self.sendMessage(CONFIG["notify_id"],
+                    "suspending broadcast for {} more days".format(days))
 
         try:
             num = int(msg["text"])
@@ -170,11 +179,18 @@ class VPlanBot(telepot.async.Bot):
 
     @asyncio.coroutine
     def broadcast_message(self):
+        if self.suspend_days > 0:
+            yield from self.sendMessage(CONFIG["notify_id"],
+                    "{} days left".format(self.suspend_days))
+            logger.info("%s days left in disable", self.suspend_days)
+            self.suspend_days -= 1
+            return
+
         recievers = self.usermanager.get_broadcasters()
-        print(recievers)
+        logging.debug("sending daily message to: %s", recievers)
 
         yield from self.sendMessage(CONFIG["notify_id"], "sending daily messages")
-        print("sending daily messages")
+        logging.info("sending daily messages")
 
         day = date.today() + timedelta(days=1)
         try:
