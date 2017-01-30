@@ -72,7 +72,11 @@ class UserManager:
 
     def get_broadcasters(self):
         self.cur.execute("SELECT id FROM users WHERE recieve_broadcast=1")
-        return  [i[0] for i in self.cur.fetchall()]
+        return [i[0] for i in self.cur.fetchall()]
+
+    def get_all_users(self):
+        self.cur.execute("SELECT id FROM users")
+        return [i[0] for i in self.cur.fetchall()]
 
     def set_broadcast(self, chat_id, b):
         self.cur.execute("UPDATE users SET recieve_broadcast=? WHERE id=?",

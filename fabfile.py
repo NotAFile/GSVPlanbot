@@ -1,5 +1,5 @@
 # pylint: disable=I,E,R,F,C
-from fabric.api import local, cd, run
+from fabric.api import local, cd, run, put
 from fabric.contrib import files
 from datetime import datetime as dt
 
@@ -12,16 +12,16 @@ def test():
 
 def deploy(directory="~/GSVPlanBot-git"):
     # check if there are uncommitted changes
-    local("git diff-index --quiet HEAD --") 
+    #local("git diff-index --quiet HEAD --") 
 
-    with cd(directory):
-        backup_db()
+    #with cd(directory):
+    #    backup_db()
 
     test()
     with cd(directory + "/GSVPlanBot"):
         put("../keyfile.prod", "../keyfile")
         run("git pull")
-        run(directory + "/env/bin/pip install -r requirements.txt")
+        #run(directory + "/env/bin/pip install -r requirements.txt")
         run("systemctl --user restart GSVPlanBot")
         run("sleep 5; systemctl --user status GSVPlanBot")
 

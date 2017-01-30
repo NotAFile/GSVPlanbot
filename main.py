@@ -121,11 +121,20 @@ class VPlanBot(telepot.async.Bot):
                 "Du wirst in Zukunft jeden Tag um 20:00 den Stundenplan erhalten")
             return
 
+        if msg["text"].startswith("/msg") and chat_id == int(CONFIG["notify_id"]):
+            logger.info("sending message to all members")
+            recievers = self.usermanager.get_all_users()
+            for user_id in recievers:
+                logging.debug("sent to %s", user_id)
+                yield from self.sendMessage(user_id, msg["text"][4:])
+            return
+
         try:
             num = int(msg["text"])
         except ValueError:
             num = None
-            message = "Error"
+            message = "Error. Bitte gib eine Zahl ein. Z.B.: 0 für heute, "
+            "1 für morgen etc."
 
         if num is not None:
             day = date.today() + timedelta(days=num)
