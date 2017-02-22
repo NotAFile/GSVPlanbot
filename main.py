@@ -127,8 +127,12 @@ class VPlanBot(telepot.async.Bot):
             logger.info("sending message to all members")
             recievers = self.usermanager.get_all_users()
             for user_id in recievers:
-                logging.debug("sent to %s", user_id)
-                yield from self.sendMessage(user_id, msg["text"][4:])
+                logging.debug("sending to %s", user_id)
+                try:
+                    yield from self.sendMessage(user_id, msg["text"][4:])
+                except telepot.TelegramError:
+                    logging.error("failed to send /msg to {}".format(user_id))
+            logging.info("sent to all members")
             return
 
         if msg["text"].startswith("/disable") and chat_id == int(CONFIG["notify_id"]):
@@ -215,7 +219,7 @@ class VPlanBot(telepot.async.Bot):
         for chat_id in recievers:
             try:
                 yield from self.sendMessage(chat_id, message)
-            except teleport.TelegramError:
+            except telepot.TelegramError:
                 logging.error("could not send message to {}".format(chat_id))
 
         notification = "sent daily messages to {} users".format(len(recievers))
