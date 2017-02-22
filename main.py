@@ -213,7 +213,10 @@ class VPlanBot(telepot.async.Bot):
         message = format_subst(result, day.strftime("%A, %d. %B"))
 
         for chat_id in recievers:
-            yield from self.sendMessage(chat_id, message)
+            try:
+                yield from self.sendMessage(chat_id, message)
+            except teleport.TelegramError:
+                logging.error("could not send message to {}".format(chat_id))
 
         notification = "sent daily messages to {} users".format(len(recievers))
         yield from self.sendMessage(CONFIG["notify_id"], notification)
