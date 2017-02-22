@@ -12,16 +12,16 @@ def test():
 
 def deploy(directory="~/GSVPlanBot-git"):
     # check if there are uncommitted changes
-    #local("git diff-index --quiet HEAD --") 
+    local("git diff-index --quiet HEAD --") 
 
-    #with cd(directory):
-    #    backup_db()
+    with cd(directory):
+        backup_db()
 
     test()
     with cd(directory + "/GSVPlanBot"):
         put("../keyfile.prod", "../keyfile")
         run("git pull")
-        #run(directory + "/env/bin/pip install -r requirements.txt")
+        run(directory + "/env/bin/pip install -r requirements.txt")
         run("systemctl --user restart GSVPlanBot")
         run("sleep 5; systemctl --user status GSVPlanBot")
 
@@ -30,10 +30,19 @@ def backup_db():
     run("cp GSVPlanBot/users.db \"backups/users.db+" + timestamp + ".bak\"")
 
 def setup_instance(directory):
-    run("mkdir " + directory)
+    if files.exists(directory):
+        print(directory, "exists, continue?")
+        input()
+
+    run("mkdir -p " + directory)
+
     with cd(directory):
-        run("git clone https://github.com/NotAFile/GSVPlanBot")
-        run("mkdir backups")
+        if files.exists("GSVPlanBot"):
+            print(directory, "exists, continue?")
+        else:
+            run("git clone https://github.com/NotAFile/GSVPlanBot")
+
+        run("mkdir -p backups")
         run("pyvenv env")
         run("env/bin/pip install -r GSVPlanBot/requirements.txt")
         run("touch GSVPlanBot/users.db")
