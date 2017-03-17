@@ -109,6 +109,8 @@ class VPlanBot(telepot.async.Bot):
         starttime = time.time()
         content_type, chat_type, chat_id = telepot.glance(msg)
 
+        yield from self.sendChatAction(chat_id, "typing")
+
         logger.info("%s %s message from %s", chat_type, content_type, chat_id)
 
         logger.debug(msg)
